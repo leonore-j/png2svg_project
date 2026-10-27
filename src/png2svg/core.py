@@ -7,9 +7,6 @@ def load_image(input):
 
     if image_path.suffix.lower() != ".png":
         raise ValueError("The input file must be a PNG image.")
-
-    if input == "":
-        raise ValueError("The input file is empty.")
     
     input = Image.open(input)
     return input 
