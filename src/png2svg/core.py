@@ -9,4 +9,4 @@ def load_image(input):
         raise ValueError("The input file must be a PNG image.")
     
     input = Image.open(input)
-    return input 
+    return input
