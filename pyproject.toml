@@ -1,0 +1,21 @@
+[project]
+name = "png2svg"
+version = "0.1.0"
+description = "A final pyhton project to convert a png file to svg"
+readme = "README.md"
+authors = [
+    { name = "ls", email = "leonore.jamet@centrale.centralelille.fr" }
+]
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+png2vsg= "png2svg.cli:main"
+
+[dependency-groups]
+dev = [
+    "marimo>=0.25.2",
+    "pillow>=13.0.0",
+    "pytest>=9.1.1",
+    "ruff>=0.17.3",
+]
