@@ -2,7 +2,6 @@
 
 """png2svg package — see core.py for the implementation."""
 
-from png2svg.core import *
+from png2svg.core import load_image
 
-all = ["svg2png"]
-version = "0.1.0"
+__all__ = ["load_image"]

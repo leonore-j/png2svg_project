@@ -500,22 +500,24 @@ wheels = [
 [[package]]
 name = "png2svg"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
+dependencies = [
+    { name = "pillow" },
+]
 
 [package.dev-dependencies]
 dev = [
     { name = "marimo" },
-    { name = "pillow" },
     { name = "pytest" },
     { name = "ruff" },
 ]
 
 [package.metadata]
+requires-dist = [{ name = "pillow" }]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "marimo", specifier = ">=0.25.2" },
-    { name = "pillow", specifier = ">=13.0.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "ruff", specifier = ">=0.17.3" },
 ]
