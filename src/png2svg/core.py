@@ -25,12 +25,12 @@ def hex_vertices(center,width) :
     
     cx, cy = center 
     radius = width / math.sqrt(3)
-    vertices = []
-    for i in range(6):
-        vertix_i = (
-        cx + radius * math.cos(math.radians(60 * i - 90)),  # first vertix (vertix0) at -90°
-        cy + radius * math.sin(math.radians(60 * i - 90))) 
-        vertices.append(vertix_i)
-    return vertices
+    return [
+        (
+            cx + radius * math.cos(math.radians(60 * i - 90)),
+            cy + radius * math.sin(math.radians(60 * i - 90)),
+        )
+        for i in range(6)
+    ]
 
     
