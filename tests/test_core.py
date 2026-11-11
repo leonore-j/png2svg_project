@@ -4,7 +4,7 @@ from pathlib import Path
 import math
 import numpy as np
 
-from png2svg.core import *
+from png2svg.core import load_image, hex_vertices
 
 # Test load_image
 
