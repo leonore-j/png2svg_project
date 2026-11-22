@@ -1,10 +1,10 @@
+import math
+from pathlib import Path
+
 import pytest
 from PIL import Image
-from pathlib import Path
-import math
-import numpy as np
 
-from png2svg.core import load_image, hex_vertices, hexagonal_grid_coordinates
+from png2svg.core import hex_vertices, hexagonal_grid_coordinates, load_image
 
 # Test load_image
 

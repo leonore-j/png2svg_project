@@ -1,6 +1,8 @@
-from PIL import Image
-from pathlib import Path
 import math
+from pathlib import Path
+
+from PIL import Image
+
 
 def load_image(input):
     """Load a PNG image."""
@@ -55,8 +57,10 @@ def hexagonal_grid_coordinates(image_width, image_height, hex_width):
     Raises:
         ValueError: if any argument is not strictly positive.
     """
-    if image_width <= 0 or image_height <= 0 or hex_width <= 0:
+    if image_width <= 0 or image_height <= 0 or hex_width <= 0 :
         raise ValueError("image dimensions and hex_width must be positive")
+    if hex_width > image_width:
+        raise ValueError("hex_width must me inferior to image_width.")
 
     size = hex_width / math.sqrt(3)  # radius: center -> vertex
     row_spacing = 1.5 * size # space between 2 centers on consecutive rows
