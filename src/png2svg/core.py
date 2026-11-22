@@ -33,4 +33,50 @@ def hex_vertices(center,width) :
         for i in range(6)
     ]
 
-    
+# help and conventions from redblobgames.com
+
+def hexagonal_grid_coordinates(image_width, image_height, hex_width):
+    """Compute the pixel coordinates of hexagon centers covering an image.
+
+    The grid uses pointy-top hexagons and the "even-r" layout: even rows
+    (0, 2, ...) are shoved right by half a hexagon width. The image's
+    top-left corner is at (0, 0), with y pointing down.
+
+    Args:
+        image_width: image width in pixels.
+        image_height: image height in pixels.
+        hex_width: flat-to-flat width of a hexagon, in pixels.
+
+    Returns:
+        A 2D list indexed as ``grid[row][col]``, where each item is the
+        (x, y) pixel coordinate of a hexagon center. Rows may have different
+        lengths because of the even-r offset.
+
+    Raises:
+        ValueError: if any argument is not strictly positive.
+    """
+    if image_width <= 0 or image_height <= 0 or hex_width <= 0:
+        raise ValueError("image dimensions and hex_width must be positive")
+
+    size = hex_width / math.sqrt(3)  # radius: center -> vertex
+    row_spacing = 1.5 * size # space between 2 centers on consecutive rows
+
+
+    grid = [] #list[list[Point]]
+    row = 0
+    # A row is kept while its top (y pointing down) vertex is above the image's bottom edge.
+    while row_spacing * row - size / 2 < image_height :
+        y = size / 2 + row_spacing * row
+        if row % 2 == 0 : # even-r convention
+            shift = hex_width / 2
+        else : 
+            shift  = 0  
+        line = [] # list[Point]
+        col = 0
+        # A hexagon is kept while its left edge is before the image's right edge.
+        while shift + col * hex_width - hex_width / 2 < image_width : 
+            line.append((shift + col * hex_width, y))
+            col += 1
+        grid.append(line)
+        row += 1
+    return grid
