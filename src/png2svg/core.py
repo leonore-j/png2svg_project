@@ -84,3 +84,17 @@ def hexagonal_grid_coordinates(image_width, image_height, hex_width):
         grid.append(line)
         row += 1
     return grid
+
+def compute_next_coord(grid,pos):
+    """Given a grid and a current position, computes and returns the next position.
+    Returns (-1,-1) if the grid is over. 
+
+    Args:
+        grid (2D Array): the image pixel grid
+        pos (tuple): coordinates of the current position
+
+    Returns:
+        tuple : coordinates (row, col) of the next position in the grid, 
+        (-1,-1) if the grid is over.
+    """
+    return pos
