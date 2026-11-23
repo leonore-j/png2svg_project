@@ -223,4 +223,8 @@ def test_generate_hexagon_has_expected_vertices_and_color() -> None:
     assert polygon.get("fill") == "rgb(200,50,10)"
 
     points = [tuple(map(float, p.split(","))) for p in polygon.get("points").split()]
-    assert points == pytest.approx(hex_vertices((50, 50), 20), abs=0.01)
+    expected = hex_vertices((50, 50), 20)
+
+    assert len(points) == len(expected) == 6
+    for point, vertex in zip(points, expected):
+        assert point == pytest.approx(vertex, abs=0.01)
