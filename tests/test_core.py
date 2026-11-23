@@ -10,7 +10,8 @@ from png2svg.core import (
     hexagonal_grid_coordinates,
     load_image,
     in_hex,
-    sample_color
+    sample_color,
+    generate_hexagon
 )
 
 # Test load_image
@@ -208,3 +209,11 @@ def test_pixels_outside_the_hexagon_are_ignored() -> None:
 def test_hexagon_partly_outside_the_image_does_not_raise() -> None:
     img = Image.new("RGB", (100, 100), BASE)
     assert sample_color((0, 0), img, WIDTH) == BASE
+
+
+# Test generate_hexagon
+
+def test_geometry_contains_vertices_and_color() -> None:
+    geometry = generate_hexagon((50, 50), (200, 50, 10), 20)
+    assert geometry["vertices"] == hex_vertices((50, 50), 20)
+    assert geometry["color"] == (200, 50, 10)

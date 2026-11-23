@@ -187,4 +187,14 @@ def sample_color(coord, input, hex_width):
     return (round(r_sum / n_pixels),round(g_sum / n_pixels),
             round(b_sum / n_pixels),)
 
-    
+
+def generate_hexagon(coord, rgb, hex_width):
+    """Returns the list of the 6 vertices of the hexagon 
+    (coord of center are parameter of the function) and the RGB code of the hexagon color. 
+
+    Args:
+        coord (tuple): coordinates of the hexagon center
+        rgb (tuple): RGB code of the hexagon color 
+        hex_width (float): hexagon width
+    """
+    return
