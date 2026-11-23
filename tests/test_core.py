@@ -1,19 +1,18 @@
 import math
 from pathlib import Path
+from xml.etree import ElementTree
 
 import pytest
 from PIL import Image
 
-from xml.etree import ElementTree
-
 from png2svg.core import (
     compute_next_coord,
+    generate_hexagon,
     hex_vertices,
     hexagonal_grid_coordinates,
-    load_image,
     in_hex,
+    load_image,
     sample_color,
-    generate_hexagon
 )
 
 # Test load_image
