@@ -5,13 +5,23 @@ from PIL import Image
 
 
 def load_image(input):
-    """Load a PNG image."""
+    """ Load a png image and returns the associated pixel grid (RGB format)
+
+    Args:
+        input (.jpg file): the jpeg image to be converted
+
+    Raises:
+        ValueError: 
+
+    Returns:
+        2D Array: The "RGB" pixel grid
+    """
     image_path = Path(input)
 
     if image_path.suffix.lower() != ".png":
         raise ValueError("The input file must be a PNG image.")
     
-    input = Image.open(input)
+    input = Image.open(input).convert("RGB")
     return input
 
 def hex_vertices(center,width) : 
@@ -140,3 +150,41 @@ def in_hex(dx,dy,hex_width):
         return False
 
     return True
+
+def sample_color(coord, input, hex_width):
+    """Given an hexagon with center of coordinates coord and of width hex_width, 
+    and a grid of pixel (input), it returns the RGB code of the average color 
+    of all pixels contained in the hexagon
+
+    Args:
+        coord (tuple): coordinate of the hexagon coordinate
+        input (2D array): grid of pixel
+        hex_width (float): hexagon width
+    """
+    cx, cy = coord  # hexagon center
+    img = input.convert("RGB")
+    width, height = img.size
+
+    r_sum, g_sum, b_sum = 0, 0, 0
+    n_pixels = 0  # number of pixels contained in the hexagon
+    radius = hex_width / math.sqrt(3)
+    half_width = hex_width / 2
+
+    for px in range(math.floor(cx - half_width), math.floor(cx + half_width) + 1):
+        for py in range(math.floor(cy - radius), math.floor(cy + radius) + 1):
+            if not (0 <= px < width and 0 <= py < height):
+                continue  # pixel outside the image
+            if in_hex(px - cx, py - cy, hex_width):
+                r, g, b = img.getpixel((px, py))
+                r_sum += r
+                g_sum += g
+                b_sum += b
+                n_pixels += 1
+
+    if n_pixels == 0:
+        raise ValueError("No pixel of the image lies in this hexagon")
+
+    return (round(r_sum / n_pixels),round(g_sum / n_pixels),
+            round(b_sum / n_pixels),)
+
+    
