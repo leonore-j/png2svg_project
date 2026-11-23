@@ -179,4 +179,4 @@ def test_returns_sentinel_when_grid_is_traversed() -> None:
     ],
 )
 def test_in_hexagon(dx: float, dy: float, expected: bool) -> None:
-    assert in_hex(dx, dy, 50, 50, 20) is expected
+    assert in_hex(dx, dy, 20) is expected

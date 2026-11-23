@@ -109,3 +109,34 @@ def compute_next_coord(grid,pos):
     if row + 1 < len(grid):  # first center of the next row
         return (row + 1, 0)
     return (-1,-1)
+
+# Sample color 
+
+# 1. Helper in_hexagon 
+
+def in_hex(dx,dy,hex_width):
+    """Given an hexagon of center (cx,cy) and width hex_width, the function returns
+    true if a pixel of coordinates (cx + dx, cy + dy) is in the hexagon. 
+    Returns False otherwise
+
+    Args:
+        dx (float): offset between the row coord of the hexagon center 
+        and the row coordinate of the pixel
+        dy (float): offset between the column coord of the hexagon center 
+        and the column coordinate of the pixel
+        hex_width (float): hexagone width
+    """
+    dx = abs(dx)
+    dy = abs(dy)
+
+    radius = hex_width / math.sqrt(3)
+    half_width = hex_width / 2
+
+    if dx > half_width:
+        return False
+
+    max_dy = radius - dx / math.sqrt(3)
+    if dy > max_dy:
+        return False
+
+    return True
