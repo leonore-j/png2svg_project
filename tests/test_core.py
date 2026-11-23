@@ -4,7 +4,12 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
-from png2svg.core import hex_vertices, hexagonal_grid_coordinates, load_image
+from png2svg.core import (
+    compute_next_coord,
+    hex_vertices,
+    hexagonal_grid_coordinates,
+    load_image,
+)
 
 # Test load_image
 
@@ -134,3 +139,27 @@ def test_every_pixel_belongs_to_a_hexagon() -> None:
 
 
 
+# Test compute_next_coord
+
+# hex grid : 2 centers on even rows and three on odd rows
+GRID = [[(0, 0), (1, 0)], [(0, 1), (1, 1), (2, 1)]] 
+
+
+def test_first_coordinate() :
+    assert compute_next_coord(GRID, None) == (0, 0)
+
+
+@pytest.mark.parametrize(
+    "current, expected",
+    [
+        ((0, 0), (0, 1)),  # go to next coord in the same row
+        ((0, 1), (1, 0)),  # end of row -> switch to next row
+        ((1, 1), (1, 2)),  # odd row -> difference of length
+    ],
+)
+def test_moves_to_next_position(current, expected) -> None:
+    assert compute_next_coord(GRID, current) == expected
+
+
+def test_returns_sentinel_when_grid_is_traversed() -> None:
+    assert compute_next_coord(GRID, (1, 2)) == (-1, -1)

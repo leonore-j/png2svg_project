@@ -84,3 +84,28 @@ def hexagonal_grid_coordinates(image_width, image_height, hex_width):
         grid.append(line)
         row += 1
     return grid
+
+def compute_next_coord(grid,pos):
+    """Given a grid and a current position, computes and returns the next position.
+    Returns (-1,-1) if the grid is over. 
+    To compute the first position, call compute_next_grid(grid,None)
+
+    Args:
+        grid (2D Array): the image pixel grid
+        pos (tuple): coordinates of the current position
+
+    Returns:
+        tuple : coordinates (row, col) of the next position in the grid, 
+        (-1,-1) if the grid is over.
+    """
+    if not grid or not grid[0]:
+        raise ValueError("The grid is empty")
+    if pos is None:
+        return (0, 0)
+
+    row, col = pos
+    if col + 1 < len(grid[row]):  # next center in the same row
+        return (row, col + 1)
+    if row + 1 < len(grid):  # first center of the next row
+        return (row + 1, 0)
+    return (-1,-1)
