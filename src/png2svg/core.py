@@ -98,32 +98,14 @@ def compute_next_coord(grid,pos):
         tuple : coordinates (row, col) of the next position in the grid, 
         (-1,-1) if the grid is over.
     """
-    if len(grid) == 0 or len(grid[0])== 0: 
+    if not grid or not grid[0]:
         raise ValueError("The grid is empty")
-        
-    if pos == None: 
-        return (0,0)
-    
-    n_row = len(grid)
-    n_col_even = len(grid[0]) 
-    if len(grid) >= 2: # even and odd rows have different sizes
-        n_col_odd = len(grid[1])
+    if pos is None:
+        return (0, 0)
 
-    row,col = pos
-    n_col_current = n_col_even if row % 2 == 0 else n_col_odd
-    if row == n_row - 1 and col == n_col_current - 1 :
-        return (-1,-1) # grid is over
-    
-    if row % 2 == 0 : 
-        if col < n_col_even - 1 : 
-            col += 1
-        else :   # end of even row
-            col = 0
-            row += 1
-    else : 
-        if col < n_col_odd - 1 : 
-            col += 1
-        else : # end of odd row
-            col = 0
-            row += 1
-    return (row,col)
+    row, col = pos
+    if col + 1 < len(grid[row]):  # next center in the same row
+        return (row, col + 1)
+    if row + 1 < len(grid):  # first center of the next row
+        return (row + 1, 0)
+    return (-1,-1)
