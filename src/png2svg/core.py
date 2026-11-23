@@ -110,7 +110,8 @@ def compute_next_coord(grid,pos):
         n_col_odd = len(grid[1])
 
     row,col = pos
-    if row == n_row - 1 and (col == n_col_even - 1 or col == n_col_odd - 1) : 
+    n_col_current = n_col_even if row % 2 == 0 else n_col_odd
+    if row == n_row - 1 and col == n_col_current - 1 :
         return (-1,-1) # grid is over
     
     if row % 2 == 0 : 

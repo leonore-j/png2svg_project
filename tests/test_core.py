@@ -4,7 +4,12 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
-from png2svg.core import hex_vertices, hexagonal_grid_coordinates, load_image, compute_next_coord
+from png2svg.core import (
+    compute_next_coord,
+    hex_vertices,
+    hexagonal_grid_coordinates,
+    load_image,
+)
 
 # Test load_image
 
