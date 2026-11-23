@@ -1,16 +1,18 @@
 import math
 from pathlib import Path
+from xml.etree import ElementTree
 
 import pytest
 from PIL import Image
 
 from png2svg.core import (
     compute_next_coord,
+    generate_hexagon,
     hex_vertices,
     hexagonal_grid_coordinates,
-    load_image,
     in_hex,
-    sample_color
+    load_image,
+    sample_color,
 )
 
 # Test load_image
@@ -208,3 +210,20 @@ def test_pixels_outside_the_hexagon_are_ignored() -> None:
 def test_hexagon_partly_outside_the_image_does_not_raise() -> None:
     img = Image.new("RGB", (100, 100), BASE)
     assert sample_color((0, 0), img, WIDTH) == BASE
+
+
+# Test generate_hexagon
+
+def test_generate_hexagon_has_expected_vertices_and_color() -> None:
+    svg = generate_hexagon((50, 50), (200, 50, 10), 20)
+    polygon = ElementTree.fromstring(svg)
+
+    assert polygon.tag == "polygon"
+    assert polygon.get("fill") == "rgb(200,50,10)"
+
+    points = [tuple(map(float, p.split(","))) for p in polygon.get("points").split()]
+    expected = hex_vertices((50, 50), 20)
+
+    assert len(points) == len(expected) == 6
+    for point, vertex in zip(points, expected):
+        assert point == pytest.approx(vertex, abs=0.01)

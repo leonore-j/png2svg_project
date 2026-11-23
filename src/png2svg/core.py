@@ -187,4 +187,16 @@ def sample_color(coord, input, hex_width):
     return (round(r_sum / n_pixels),round(g_sum / n_pixels),
             round(b_sum / n_pixels),)
 
-    
+
+def generate_hexagon(coord, rgb, hex_width):
+    """Return the SVG hexagon filled with "rgb".
+
+    Args:
+        coord (tuple): coordinates of the hexagon center
+        rgb (tuple): RGB code of the hexagon color 
+        hex_width (float): hexagon width
+    """
+    vertices = hex_vertices(coord, hex_width) # re-use the helper function created for hex_grid_coord
+    points = " ".join(f"{x:.2f},{y:.2f}" for x, y in vertices)
+    r, g, b = rgb
+    return f'<polygon points="{points}" fill="rgb({r},{g},{b})"/>'
