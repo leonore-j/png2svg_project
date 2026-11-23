@@ -9,6 +9,7 @@ from png2svg.core import (
     hex_vertices,
     hexagonal_grid_coordinates,
     load_image,
+    in_hex
 )
 
 # Test load_image
@@ -163,3 +164,19 @@ def test_moves_to_next_position(current, expected) -> None:
 
 def test_returns_sentinel_when_grid_is_traversed() -> None:
     assert compute_next_coord(GRID, (1, 2)) == (-1, -1)
+
+# Test sample_color
+
+# 1. Test helper in_hexagon
+
+@pytest.mark.parametrize(
+    "dx, dy, expected",
+    [
+        (0, 0, True),      # centre
+        (8, -5, True),     # près du côté oblique, mais dedans
+        (10, -10, False),  # coin de la boîte englobante, hors hexagone
+        (11, 0, False),    # au-delà du côté vertical (demi-largeur = 10)
+    ],
+)
+def test_in_hexagon(dx: float, dy: float, expected: bool) -> None:
+    assert in_hex(dx, dy, 50, 50, 20) is expected
