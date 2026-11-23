@@ -9,6 +9,8 @@ from png2svg.core import (
     hex_vertices,
     hexagonal_grid_coordinates,
     load_image,
+    in_hex,
+    sample_color
 )
 
 # Test load_image
@@ -163,3 +165,46 @@ def test_moves_to_next_position(current, expected) -> None:
 
 def test_returns_sentinel_when_grid_is_traversed() -> None:
     assert compute_next_coord(GRID, (1, 2)) == (-1, -1)
+
+# Test sample_color
+
+# 1. Test helper in_hexagon
+
+@pytest.mark.parametrize(
+    "dx, dy, expected",
+    [
+        (0, 0, True),      # centre
+        (8, -5, True),     # près du côté oblique, mais dedans
+        (10, -10, False),  # coin de la boîte englobante, hors hexagone
+        (11, 0, False),    # au-delà du côté vertical (demi-largeur = 10)
+    ],
+)
+def test_in_hexagon(dx: float, dy: float, expected: bool) -> None:
+    assert in_hex(dx, dy, 20) is expected
+
+# 2. Test sample_color
+
+WIDTH = 20
+BASE = (200, 50, 10)
+
+def test_uniform_image_returns_its_color() -> None:
+    img = Image.new("RGB", (100, 100), BASE)
+    assert sample_color((50, 50), img, WIDTH) == BASE
+
+
+def test_color_is_the_average_of_the_hexagon() -> None:
+    img = Image.new("RGB", (100, 100), (0, 0, 0))
+    img.paste((255, 255, 255), (50, 0, 100, 100))  # moitié droite blanche
+    r, g, b = sample_color((50, 50), img, WIDTH)
+    assert (r, g, b) == pytest.approx((127, 127, 127), abs=10)
+
+
+def test_pixels_outside_the_hexagon_are_ignored() -> None:
+    img = Image.new("RGB", (100, 100), BASE)
+    img.paste((255, 255, 255), (58, 40, 61, 43))  # coin de la boîte, hors hexagone
+    assert sample_color((50, 50), img, WIDTH) == BASE
+
+
+def test_hexagon_partly_outside_the_image_does_not_raise() -> None:
+    img = Image.new("RGB", (100, 100), BASE)
+    assert sample_color((0, 0), img, WIDTH) == BASE
