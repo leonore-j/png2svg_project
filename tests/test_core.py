@@ -4,6 +4,8 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
+from xml.etree import ElementTree
+
 from png2svg.core import (
     compute_next_coord,
     hex_vertices,
@@ -213,7 +215,12 @@ def test_hexagon_partly_outside_the_image_does_not_raise() -> None:
 
 # Test generate_hexagon
 
-def test_geometry_contains_vertices_and_color() -> None:
-    geometry = generate_hexagon((50, 50), (200, 50, 10), 20)
-    assert geometry["vertices"] == hex_vertices((50, 50), 20)
-    assert geometry["color"] == (200, 50, 10)
+def test_generate_hexagon_has_expected_vertices_and_color() -> None:
+    svg = generate_hexagon((50, 50), (200, 50, 10), 20)
+    polygon = ElementTree.fromstring(svg)
+
+    assert polygon.tag == "polygon"
+    assert polygon.get("fill") == "rgb(200,50,10)"
+
+    points = [tuple(map(float, p.split(","))) for p in polygon.get("points").split()]
+    assert points == pytest.approx(hex_vertices((50, 50), 20), abs=0.01)
