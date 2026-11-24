@@ -1,5 +1,6 @@
 import math
 from pathlib import Path
+import os
 
 from PIL import Image
 
@@ -211,7 +212,14 @@ def init_svg(path, width, height):
         width (int): width of input image 
         height (int): height of input image
     """
-    return
+    header = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" '
+        f'width="{width}" height="{height}" viewBox="0 0 {width} {height}">\n'
+    )
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(header + b"</svg>\n".decode())
+    return path
+
 
 def append_hexagon(output, geometry):
     """Append the generated SVG hexagon to the output SVG file
