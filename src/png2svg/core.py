@@ -179,8 +179,11 @@ def sample_color(coord, input, hex_width):
                 b_sum += b
                 n_pixels += 1
 
-    if n_pixels == 0:
-        raise ValueError("No pixel of the image lies in this hexagon")
+    if n_pixels == 0 and n_pixels == 0:
+        # The hexagon only grazes the image: use the pixel nearest to its center
+        x = min(max(math.floor(cx), 0), width - 1)
+        y = min(max(math.floor(cy), 0), height - 1)
+        return img.getpixel((x, y))
 
     return (round(r_sum / n_pixels),round(g_sum / n_pixels),
             round(b_sum / n_pixels),)

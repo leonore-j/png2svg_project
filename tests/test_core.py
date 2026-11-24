@@ -14,8 +14,8 @@ from png2svg.core import (
     in_hex,
     init_svg,
     load_image,
+    png2svg,
     sample_color,
-    png2svg
 )
 
 # Test load_image
