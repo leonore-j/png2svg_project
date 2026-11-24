@@ -200,3 +200,24 @@ def generate_hexagon(coord, rgb, hex_width):
     points = " ".join(f"{x:.2f},{y:.2f}" for x, y in vertices)
     r, g, b = rgb
     return f'<polygon points="{points}" fill="rgb({r},{g},{b})"/>'
+
+# Generate output (SVG file) and append hexagon to output
+
+def init_svg(path, width, height):
+    """Create an empty SVG document (root element only) and return its path.
+
+    Args:
+        path (string): name of the outputpath
+        width (int): width of input image 
+        height (int): height of input image
+    """
+    return
+
+def append_hexagon(output, geometry):
+    """Append the generated SVG hexagon to the output SVG file
+
+    Args:
+        output (string): path of the output SVG file
+        geometry (string): SVG hexagon to be added to the output
+    """
+    return
