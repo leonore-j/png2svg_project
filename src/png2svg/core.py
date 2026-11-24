@@ -228,7 +228,7 @@ def append_hexagon(output, geometry):
     with open(output, "rb+") as f:
         f.seek(-len(b"</svg>\n"), os.SEEK_END)
         f.write(geometry.encode("utf-8") + b"\n" + b"</svg>\n")
-        
+
 
 def png2svg(input_path, output_path, hex_width):
     """Transform a png image (given by input_path) into a svg file 
@@ -240,4 +240,20 @@ def png2svg(input_path, output_path, hex_width):
         output_path (str): the output path of the output svg file.
         hex_width (int): width of the hexagon of the svg grid
     """
-    return
+    img = load_image(input_path)
+    width, height = img.size
+    grid = hexagonal_grid_coordinates(width, height, hex_width)
+    output = init_svg(output_path, width, height)
+
+    pos = None
+    while True:
+        pos = compute_next_coord(grid, pos)
+        if pos == (-1,-1):
+            break
+        row, col = pos
+        coord = grid[row][col]
+        rgb = sample_color(coord, img, hex_width)
+        geometry = generate_hexagon(coord, rgb, hex_width)
+        append_hexagon(output, geometry)
+    return output
+  

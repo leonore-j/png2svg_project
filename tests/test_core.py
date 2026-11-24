@@ -214,6 +214,11 @@ def test_hexagon_partly_outside_the_image_does_not_raise() -> None:
     img = Image.new("RGB", (100, 100), BASE)
     assert sample_color((0, 0), img, WIDTH) == BASE
 
+def test_hexagon_grazing_the_image_uses_the_nearest_pixel() -> None:
+    img = Image.new("RGB", (57, 43), BASE)
+    img.paste((255, 255, 255), (0, 42, 57, 43))  
+    assert sample_color((30, 48.49), img, 10.5) == (255, 255, 255)
+
 
 # Test generate_hexagon
 
