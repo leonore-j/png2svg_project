@@ -6,11 +6,13 @@ import pytest
 from PIL import Image
 
 from png2svg.core import (
+    append_hexagon,
     compute_next_coord,
     generate_hexagon,
     hex_vertices,
     hexagonal_grid_coordinates,
     in_hex,
+    init_svg,
     load_image,
     sample_color,
 )
@@ -227,3 +229,37 @@ def test_generate_hexagon_has_expected_vertices_and_color() -> None:
     assert len(points) == len(expected) == 6
     for point, vertex in zip(points, expected):
         assert point == pytest.approx(vertex, abs=0.01)
+
+
+# Test Geometry
+
+SVG_NS = "{http://www.w3.org/2000/svg}"
+FIRST = '<polygon points="0,0 1,0 1,1" fill="rgb(1,2,3)"/>'
+SECOND = '<polygon points="2,2 3,2 3,3" fill="rgb(4,5,6)"/>'
+
+def fills(path) -> list[str]:
+    root = ElementTree.parse(path).getroot()
+    return [p.get("fill") for p in root.findall(f"{SVG_NS}polygon")]
+
+# 1. Test helper init_svg
+
+def test_init_svg_creates_an_empty_scalable_document(tmp_path) -> None:
+    output = init_svg(tmp_path / "out.svg", 100, 50)
+    root = ElementTree.parse(output).getroot()
+    assert root.tag == f"{SVG_NS}svg"
+    assert root.get("viewBox") == "0 0 100 50"
+    assert len(root) == 0
+
+# 2. Test append_hexagon
+
+def test_append_hexagon_writes_the_polygon_in_the_file(tmp_path) -> None:
+    output = init_svg(tmp_path / "out.svg", 100, 50)
+    append_hexagon(output, FIRST)
+    assert fills(output) == ["rgb(1,2,3)"]
+
+
+def test_append_hexagon_keeps_previous_hexagons_in_order(tmp_path) -> None:
+    output = init_svg(tmp_path / "out.svg", 100, 50)
+    append_hexagon(output, FIRST)
+    append_hexagon(output, SECOND)
+    assert fills(output) == ["rgb(1,2,3)", "rgb(4,5,6)"]
