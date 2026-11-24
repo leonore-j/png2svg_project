@@ -14,6 +14,7 @@ from png2svg.core import (
     in_hex,
     init_svg,
     load_image,
+    png2svg,
     sample_color,
 )
 
@@ -213,6 +214,11 @@ def test_hexagon_partly_outside_the_image_does_not_raise() -> None:
     img = Image.new("RGB", (100, 100), BASE)
     assert sample_color((0, 0), img, WIDTH) == BASE
 
+def test_hexagon_grazing_the_image_uses_the_nearest_pixel() -> None:
+    img = Image.new("RGB", (57, 43), BASE)
+    img.paste((255, 255, 255), (0, 42, 57, 43))  
+    assert sample_color((30, 48.49), img, 10.5) == (255, 255, 255)
+
 
 # Test generate_hexagon
 
@@ -263,3 +269,87 @@ def test_append_hexagon_keeps_previous_hexagons_in_order(tmp_path) -> None:
     append_hexagon(output, FIRST)
     append_hexagon(output, SECOND)
     assert fills(output) == ["rgb(1,2,3)", "rgb(4,5,6)"]
+
+
+# Test wrapper : png2svg
+
+SVG_NS = "{http://www.w3.org/2000/svg}"
+IMG_WIDTH, IMG_HEIGHT, F2F_HEX_WIDTH = 60, 40, 10
+IMG_COLOR = (200, 50, 10)
+
+
+def make_png(path, size=(IMG_WIDTH, IMG_HEIGHT), color=IMG_COLOR, mode="RGB"):
+    Image.new(mode, size, color).save(path)
+    return path
+
+
+def read_svg(path):
+    root = ElementTree.parse(path).getroot()  # lève une erreur si le XML est invalide
+    return root, root.findall(f"{SVG_NS}polygon")
+
+
+def centroid_x(polygon) -> float:
+    points = [tuple(map(float, p.split(","))) for p in polygon.get("points").split()]
+    return sum(x for x, _ in points) / len(points)
+
+
+@pytest.fixture
+def source(tmp_path):
+    return make_png(tmp_path / "in.png")
+
+
+def test_creates_svg_with_image_size_and_returns_its_path(source, tmp_path) -> None:
+    out = tmp_path / "out.svg"
+    assert png2svg(source, out, F2F_HEX_WIDTH) == out
+    root, _ = read_svg(out)
+    assert root.get("viewBox") == f"0 0 {IMG_WIDTH} {IMG_HEIGHT}"
+
+
+def test_one_polygon_per_grid_center(source, tmp_path) -> None:
+    out = png2svg(source, tmp_path / "out.svg", F2F_HEX_WIDTH)
+    _, polygons = read_svg(out)
+    grid = hexagonal_grid_coordinates(IMG_WIDTH, IMG_HEIGHT, F2F_HEX_WIDTH)
+    assert len(polygons) == sum(len(row) for row in grid)
+
+
+def test_uniform_image_gives_uniformly_colored_hexagons(source, tmp_path) -> None:
+    out = png2svg(source, tmp_path / "out.svg", F2F_HEX_WIDTH)
+    _, polygons = read_svg(out)
+    assert {p.get("fill") for p in polygons} == {"rgb(200,50,10)"}
+
+def test_hexagons_take_the_color_of_their_area_of_the_image(tmp_path) -> None:
+    img = Image.new("RGB", (100, 40), (0, 0, 0))
+    img.paste((255, 255, 255), (50, 0, 100, 40))   
+    img.save(tmp_path / "half.png")
+
+    out = png2svg(tmp_path / "half.png", tmp_path / "out.svg", F2F_HEX_WIDTH)
+    _, polygons = read_svg(out)
+
+    left = [p for p in polygons if centroid_x(p) < 40]
+    right = [p for p in polygons if centroid_x(p) > 60]
+    assert left and right                          
+    assert all(p.get("fill") == "rgb(0,0,0)" for p in left)
+    assert all(p.get("fill") == "rgb(255,255,255)" for p in right)
+
+
+@pytest.mark.parametrize("hex_width", [7, 10.5, 15.3])
+def test_non_round_hexagon_width_on_odd_sized_image(tmp_path, hex_width) -> None:
+    src = make_png(tmp_path / "odd.png", size=(57, 43))
+    out = png2svg(src, tmp_path / "out.svg", hex_width)
+    _, polygons = read_svg(out)
+    grid = hexagonal_grid_coordinates(57, 43, hex_width)
+    assert len(polygons) == sum(len(row) for row in grid)
+
+
+@pytest.mark.parametrize(
+    "filename, hex_width",
+    [("photo.jpg", F2F_HEX_WIDTH), ("in.png", 0), ("in.png", -10)],
+)
+def test_invalid_input_raises_and_creates_no_file(tmp_path, filename, hex_width) -> None:
+    make_png(tmp_path / "in.png")
+    out = tmp_path / "out.svg"
+    with pytest.raises(ValueError):
+        png2svg(tmp_path / filename, out, hex_width)
+    assert not out.exists()
+
+

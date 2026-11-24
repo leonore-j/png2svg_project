@@ -179,8 +179,11 @@ def sample_color(coord, input, hex_width):
                 b_sum += b
                 n_pixels += 1
 
-    if n_pixels == 0:
-        raise ValueError("No pixel of the image lies in this hexagon")
+    if n_pixels == 0 and n_pixels == 0:
+        # The hexagon only grazes the image: use the pixel nearest to its center
+        x = min(max(math.floor(cx), 0), width - 1)
+        y = min(max(math.floor(cy), 0), height - 1)
+        return img.getpixel((x, y))
 
     return (round(r_sum / n_pixels),round(g_sum / n_pixels),
             round(b_sum / n_pixels),)
@@ -228,3 +231,32 @@ def append_hexagon(output, geometry):
     with open(output, "rb+") as f:
         f.seek(-len(b"</svg>\n"), os.SEEK_END)
         f.write(geometry.encode("utf-8") + b"\n" + b"</svg>\n")
+
+
+def png2svg(input_path, output_path, hex_width):
+    """Transform a png image (given by input_path) into a svg file 
+    stored into ouput_path. The hexagon of the SVG are grid have their width 
+    equal to hex_width.
+
+    Args:
+        input_path (str): the input path of the input png image
+        output_path (str): the output path of the output svg file.
+        hex_width (int): width of the hexagon of the svg grid
+    """
+    img = load_image(input_path)
+    width, height = img.size
+    grid = hexagonal_grid_coordinates(width, height, hex_width)
+    output = init_svg(output_path, width, height)
+
+    pos = None
+    while True:
+        pos = compute_next_coord(grid, pos)
+        if pos == (-1,-1):
+            break
+        row, col = pos
+        coord = grid[row][col]
+        rgb = sample_color(coord, img, hex_width)
+        geometry = generate_hexagon(coord, rgb, hex_width)
+        append_hexagon(output, geometry)
+    return output
+  
