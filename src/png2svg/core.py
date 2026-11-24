@@ -1,6 +1,6 @@
 import math
-from pathlib import Path
 import os
+from pathlib import Path
 
 from PIL import Image
 
@@ -147,10 +147,7 @@ def in_hex(dx,dy,hex_width):
         return False
 
     max_dy = radius - dx / math.sqrt(3)
-    if dy > max_dy:
-        return False
-
-    return True
+    return not dy > max_dy
 
 def sample_color(coord, input, hex_width):
     """Given an hexagon with center of coordinates coord and of width hex_width, 
@@ -222,10 +219,12 @@ def init_svg(path, width, height):
 
 
 def append_hexagon(output, geometry):
-    """Append the generated SVG hexagon to the output SVG file
+    """Append the generated SVG hexagon to the output SVG file.
 
     Args:
         output (string): path of the output SVG file
         geometry (string): SVG hexagon to be added to the output
     """
-    return
+    with open(output, "rb+") as f:
+        f.seek(-len(b"</svg>\n"), os.SEEK_END)
+        f.write(geometry.encode("utf-8") + b"\n" + b"</svg>\n")

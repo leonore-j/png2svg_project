@@ -6,15 +6,15 @@ import pytest
 from PIL import Image
 
 from png2svg.core import (
+    append_hexagon,
     compute_next_coord,
     generate_hexagon,
     hex_vertices,
     hexagonal_grid_coordinates,
     in_hex,
+    init_svg,
     load_image,
     sample_color,
-    init_svg,
-    append_hexagon
 )
 
 # Test load_image
