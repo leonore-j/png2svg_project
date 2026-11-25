@@ -95,9 +95,7 @@ def test_width_must_be_positive(width: float) -> None:
 
 WIDTH = 20  # width of a hexagon
 SIZE = WIDTH / math.sqrt(3)  # size of a hexagon (h = 2*SIZE)
-ROW_SPACING = (
-    1.5 * SIZE
-)  # vertical spacing between 2 hexagon center (pointy-top orientation)
+ROW_SPACING = 1.5 * SIZE  # vertical spacing between 2 hexagon center (pointy-top orientation)
 Y0 = SIZE / 2  # Y coord of the first row is SIZE/2
 
 
@@ -147,18 +145,14 @@ def test_center_positions(row, col, expected) -> None:
         (10, 10, WIDTH),
     ],
 )
-def test_invalid_parameters_raise_value_error(
-    image_width, image_height, hex_width
-) -> None:
+def test_invalid_parameters_raise_value_error(image_width, image_height, hex_width) -> None:
     with pytest.raises(ValueError):
         hexagonal_grid_coordinates(image_width, image_height, hex_width)
 
 
 def test_every_pixel_belongs_to_a_hexagon() -> None:
     width, height = 60, 50
-    centers = [
-        c for row in hexagonal_grid_coordinates(width, height, WIDTH) for c in row
-    ]
+    centers = [c for row in hexagonal_grid_coordinates(width, height, WIDTH) for c in row]
 
     def in_hexagon(
         px: float, py: float, cx: float, cy: float
@@ -264,7 +258,7 @@ def test_generate_hexagon_has_expected_vertices_and_color() -> None:
     expected = hex_vertices((50, 50), 20)
 
     assert len(points) == len(expected) == 6
-    for point, vertex in zip(points, expected):
+    for point, vertex in zip(points, expected, strict=False):
         assert point == pytest.approx(vertex, abs=0.01)
 
 
@@ -382,9 +376,7 @@ def test_non_round_hexagon_width_on_odd_sized_image(tmp_path, hex_width) -> None
     "filename, hex_width",
     [("photo.jpg", F2F_HEX_WIDTH), ("in.png", 0), ("in.png", -10)],
 )
-def test_invalid_input_raises_and_creates_no_file(
-    tmp_path, filename, hex_width
-) -> None:
+def test_invalid_input_raises_and_creates_no_file(tmp_path, filename, hex_width) -> None:
     make_png(tmp_path / "in.png")
     out = tmp_path / "out.svg"
     with pytest.raises(ValueError):
