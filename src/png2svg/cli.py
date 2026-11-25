@@ -27,3 +27,9 @@ def build_parser() -> argparse.ArgumentParser:
         help=f"Flat-to-flat width of a hexagon, in pixels (default: {DEFAULT_HEX_WIDTH:g}).",
     )
     return parser
+
+def main() -> None:
+    return 
+
+if __name__ == "__main__":
+    main()
