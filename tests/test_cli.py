@@ -36,6 +36,7 @@ def test_parser_accepts_output_and_hex_width():
     assert args.output == "out.svg"
     assert args.hex_width == 30.0
 
+
 def test_main_creates_svg_next_to_input_by_default(monkeypatch, source):
     monkeypatch.setattr("sys.argv", ["png2svg", str(source)])
     main()
@@ -61,7 +62,9 @@ def test_main_requires_an_input(monkeypatch):
 
 def test_main_rejects_non_png_input(monkeypatch, tmp_path):
     out = tmp_path / "out.svg"
-    monkeypatch.setattr("sys.argv", ["png2svg", str(tmp_path / "photo.jpg"), "-o", str(out)])
+    monkeypatch.setattr(
+        "sys.argv", ["png2svg", str(tmp_path / "photo.jpg"), "-o", str(out)]
+    )
     with pytest.raises(SystemExit) as error:
         main()
     assert error.value.code == 2
