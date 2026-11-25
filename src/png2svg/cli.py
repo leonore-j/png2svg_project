@@ -29,7 +29,14 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 def main() -> None:
-    return 
+    parser = build_parser()
+    args = parser.parse_args()
+    output = args.output or Path(args.input).with_suffix(".svg")
+    try:
+        png2svg(args.input, output, args.hex_width)
+    except (ValueError, OSError) as error:
+        parser.error(str(error))
+    print(f"SVG written to {output}")
 
 if __name__ == "__main__":
     main()
