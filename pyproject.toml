@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.scripts]
-png2svg= "png2svg.core:main"
+png2svg= "png2svg.cli:main"
 
 [dependency-groups]
 dev = [
