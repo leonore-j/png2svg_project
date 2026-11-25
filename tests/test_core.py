@@ -20,6 +20,7 @@ from png2svg.core import (
 
 # Test load_image
 
+
 def test_load_image_correct_dim(tmp_path: Path) -> None:
     """Test that load_image returns an image with the correct dimensions."""
     image_path = tmp_path / "test_image.png"
@@ -30,6 +31,7 @@ def test_load_image_correct_dim(tmp_path: Path) -> None:
     image = load_image(image_path)
 
     assert image.size == (100, 50)
+
 
 def test_load_image_invalid_input(tmp_path: Path) -> None:
     """Test that load_image raises an error for an invalid image."""
@@ -48,7 +50,8 @@ def test_load_image_raises_error_for_empty_input() -> None:
         load_image("")
 
 
-# Test create_hexagonal_grid 
+# Test create_hexagonal_grid
+
 
 # Test helper 1 : hex_vertices()
 def test_returns_six_vertices() -> None:
@@ -60,7 +63,7 @@ def test_vertices_are_at_equal_distance_from_center() -> None:
     center = (10, 15)
     width = 20
     vertices = hex_vertices(center=center, width=width)
-    expected_radius = width / math.sqrt(3) # size
+    expected_radius = width / math.sqrt(3)  # size
     for x, y in vertices:
         distance = math.hypot(x - center[0], y - center[1])
         assert distance == pytest.approx(expected_radius)
@@ -90,17 +93,19 @@ def test_width_must_be_positive(width: float) -> None:
 
 # Test create_hexagonal_grid()
 
-WIDTH = 20 # width of a hexagon
-SIZE = WIDTH / math.sqrt(3) # size of a hexagon (h = 2*SIZE)
-ROW_SPACING = 1.5 * SIZE  # vertical spacing between 2 hexagon center (pointy-top orientation)
-Y0 = SIZE / 2  # Y coord of the first row is SIZE/2 
+WIDTH = 20  # width of a hexagon
+SIZE = WIDTH / math.sqrt(3)  # size of a hexagon (h = 2*SIZE)
+ROW_SPACING = (
+    1.5 * SIZE
+)  # vertical spacing between 2 hexagon center (pointy-top orientation)
+Y0 = SIZE / 2  # Y coord of the first row is SIZE/2
 
 
 @pytest.mark.parametrize(
     "image_size, expected_row_lengths",
     [
         ((100, 100), [5, 6, 5, 6, 5, 6, 5]),  # 5 for even rows; 6 for odd rows
-        ((130, 115), [7] * 7),                # always 7
+        ((130, 115), [7] * 7),  # always 7
     ],
 )
 def test_grid_dimensions(image_size, expected_row_lengths) -> None:
@@ -111,11 +116,19 @@ def test_grid_dimensions(image_size, expected_row_lengths) -> None:
 @pytest.mark.parametrize(
     "row, col, expected",
     [
-        (0, 0, (WIDTH / 2, Y0)),                   # first hexagon coordinate
-        (0, 1, (1.5 * WIDTH, Y0)),                 # vertical spacing = WIDTH (WIDTH / 2 + WIDTH = 1.5*WIDTH )
-        (1, 0, (0, Y0 + ROW_SPACING)),             # odd rows : left border of first hex touches left border of image
+        (0, 0, (WIDTH / 2, Y0)),  # first hexagon coordinate
+        (
+            0,
+            1,
+            (1.5 * WIDTH, Y0),
+        ),  # vertical spacing = WIDTH (WIDTH / 2 + WIDTH = 1.5*WIDTH )
+        (
+            1,
+            0,
+            (0, Y0 + ROW_SPACING),
+        ),  # odd rows : left border of first hex touches left border of image
         (1, 1, (WIDTH, Y0 + ROW_SPACING)),
-        (2, 0, (WIDTH / 2, Y0 + 2 * ROW_SPACING)), 
+        (2, 0, (WIDTH / 2, Y0 + 2 * ROW_SPACING)),
     ],
 )
 def test_center_positions(row, col, expected) -> None:
@@ -125,18 +138,31 @@ def test_center_positions(row, col, expected) -> None:
 
 @pytest.mark.parametrize(
     "image_width, image_height, hex_width",
-    [(0, 100, WIDTH), (100, 0, WIDTH), (-1, 100, WIDTH), (100, 100, 0), (100, 100, -WIDTH), (10, 10, WIDTH)],
+    [
+        (0, 100, WIDTH),
+        (100, 0, WIDTH),
+        (-1, 100, WIDTH),
+        (100, 100, 0),
+        (100, 100, -WIDTH),
+        (10, 10, WIDTH),
+    ],
 )
-def test_invalid_parameters_raise_value_error(image_width, image_height, hex_width) -> None:
+def test_invalid_parameters_raise_value_error(
+    image_width, image_height, hex_width
+) -> None:
     with pytest.raises(ValueError):
         hexagonal_grid_coordinates(image_width, image_height, hex_width)
 
 
 def test_every_pixel_belongs_to_a_hexagon() -> None:
     width, height = 60, 50
-    centers = [c for row in hexagonal_grid_coordinates(width, height, WIDTH) for c in row]
+    centers = [
+        c for row in hexagonal_grid_coordinates(width, height, WIDTH) for c in row
+    ]
 
-    def in_hexagon(px: float, py: float, cx: float, cy: float) -> bool: # (px,py) coord of one pixel, (cx,cy) coord of a hex center
+    def in_hexagon(
+        px: float, py: float, cx: float, cy: float
+    ) -> bool:  # (px,py) coord of one pixel, (cx,cy) coord of a hex center
         dx, dy = abs(px - cx), abs(py - cy)
         return dx <= WIDTH / 2 + 1e-9 and dy <= SIZE - dx / math.sqrt(3) + 1e-9
 
@@ -145,14 +171,13 @@ def test_every_pixel_belongs_to_a_hexagon() -> None:
             assert any(in_hexagon(px, py, cx, cy) for cx, cy in centers), (px, py)
 
 
-
 # Test compute_next_coord
 
 # hex grid : 2 centers on even rows and three on odd rows
-GRID = [[(0, 0), (1, 0)], [(0, 1), (1, 1), (2, 1)]] 
+GRID = [[(0, 0), (1, 0)], [(0, 1), (1, 1), (2, 1)]]
 
 
-def test_first_coordinate() :
+def test_first_coordinate():
     assert compute_next_coord(GRID, None) == (0, 0)
 
 
@@ -171,26 +196,30 @@ def test_moves_to_next_position(current, expected) -> None:
 def test_returns_sentinel_when_grid_is_traversed() -> None:
     assert compute_next_coord(GRID, (1, 2)) == (-1, -1)
 
+
 # Test sample_color
 
 # 1. Test helper in_hexagon
 
+
 @pytest.mark.parametrize(
     "dx, dy, expected",
     [
-        (0, 0, True),      # centre
-        (8, -5, True),     # près du côté oblique, mais dedans
+        (0, 0, True),  # centre
+        (8, -5, True),  # près du côté oblique, mais dedans
         (10, -10, False),  # coin de la boîte englobante, hors hexagone
-        (11, 0, False),    # au-delà du côté vertical (demi-largeur = 10)
+        (11, 0, False),  # au-delà du côté vertical (demi-largeur = 10)
     ],
 )
 def test_in_hexagon(dx: float, dy: float, expected: bool) -> None:
     assert in_hex(dx, dy, 20) is expected
 
+
 # 2. Test sample_color
 
 WIDTH = 20
 BASE = (200, 50, 10)
+
 
 def test_uniform_image_returns_its_color() -> None:
     img = Image.new("RGB", (100, 100), BASE)
@@ -214,13 +243,15 @@ def test_hexagon_partly_outside_the_image_does_not_raise() -> None:
     img = Image.new("RGB", (100, 100), BASE)
     assert sample_color((0, 0), img, WIDTH) == BASE
 
+
 def test_hexagon_grazing_the_image_uses_the_nearest_pixel() -> None:
     img = Image.new("RGB", (57, 43), BASE)
-    img.paste((255, 255, 255), (0, 42, 57, 43))  
+    img.paste((255, 255, 255), (0, 42, 57, 43))
     assert sample_color((30, 48.49), img, 10.5) == (255, 255, 255)
 
 
 # Test generate_hexagon
+
 
 def test_generate_hexagon_has_expected_vertices_and_color() -> None:
     svg = generate_hexagon((50, 50), (200, 50, 10), 20)
@@ -243,11 +274,14 @@ SVG_NS = "{http://www.w3.org/2000/svg}"
 FIRST = '<polygon points="0,0 1,0 1,1" fill="rgb(1,2,3)"/>'
 SECOND = '<polygon points="2,2 3,2 3,3" fill="rgb(4,5,6)"/>'
 
+
 def fills(path) -> list[str]:
     root = ElementTree.parse(path).getroot()
     return [p.get("fill") for p in root.findall(f"{SVG_NS}polygon")]
 
+
 # 1. Test helper init_svg
+
 
 def test_init_svg_creates_an_empty_scalable_document(tmp_path) -> None:
     output = init_svg(tmp_path / "out.svg", 100, 50)
@@ -256,7 +290,9 @@ def test_init_svg_creates_an_empty_scalable_document(tmp_path) -> None:
     assert root.get("viewBox") == "0 0 100 50"
     assert len(root) == 0
 
+
 # 2. Test append_hexagon
+
 
 def test_append_hexagon_writes_the_polygon_in_the_file(tmp_path) -> None:
     output = init_svg(tmp_path / "out.svg", 100, 50)
@@ -317,9 +353,10 @@ def test_uniform_image_gives_uniformly_colored_hexagons(source, tmp_path) -> Non
     _, polygons = read_svg(out)
     assert {p.get("fill") for p in polygons} == {"rgb(200,50,10)"}
 
+
 def test_hexagons_take_the_color_of_their_area_of_the_image(tmp_path) -> None:
     img = Image.new("RGB", (100, 40), (0, 0, 0))
-    img.paste((255, 255, 255), (50, 0, 100, 40))   
+    img.paste((255, 255, 255), (50, 0, 100, 40))
     img.save(tmp_path / "half.png")
 
     out = png2svg(tmp_path / "half.png", tmp_path / "out.svg", F2F_HEX_WIDTH)
@@ -327,7 +364,7 @@ def test_hexagons_take_the_color_of_their_area_of_the_image(tmp_path) -> None:
 
     left = [p for p in polygons if centroid_x(p) < 40]
     right = [p for p in polygons if centroid_x(p) > 60]
-    assert left and right                          
+    assert left and right
     assert all(p.get("fill") == "rgb(0,0,0)" for p in left)
     assert all(p.get("fill") == "rgb(255,255,255)" for p in right)
 
@@ -345,11 +382,11 @@ def test_non_round_hexagon_width_on_odd_sized_image(tmp_path, hex_width) -> None
     "filename, hex_width",
     [("photo.jpg", F2F_HEX_WIDTH), ("in.png", 0), ("in.png", -10)],
 )
-def test_invalid_input_raises_and_creates_no_file(tmp_path, filename, hex_width) -> None:
+def test_invalid_input_raises_and_creates_no_file(
+    tmp_path, filename, hex_width
+) -> None:
     make_png(tmp_path / "in.png")
     out = tmp_path / "out.svg"
     with pytest.raises(ValueError):
         png2svg(tmp_path / filename, out, hex_width)
     assert not out.exists()
-
-

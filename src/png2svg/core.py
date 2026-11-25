@@ -6,13 +6,13 @@ from PIL import Image
 
 
 def load_image(input):
-    """ Load a png image and returns the associated pixel grid (RGB format)
+    """Load a png image and returns the associated pixel grid (RGB format)
 
     Args:
         input (.jpg file): the jpeg image to be converted
 
     Raises:
-        ValueError: 
+        ValueError:
 
     Returns:
         2D Array: The "RGB" pixel grid
@@ -21,13 +21,14 @@ def load_image(input):
 
     if image_path.suffix.lower() != ".png":
         raise ValueError("The input file must be a PNG image.")
-    
+
     input = Image.open(input).convert("RGB")
     return input
 
-def hex_vertices(center,width) : 
+
+def hex_vertices(center, width):
     """Computes the coordinates of the 6 vertices of an hexagon
-    of center (center[0], center[1]) and of width=width. 
+    of center (center[0], center[1]) and of width=width.
 
     Args:
         center (tuple): tuple (x,y) containing the center coordinates
@@ -35,8 +36,8 @@ def hex_vertices(center,width) :
     """
     if width <= 0:
         raise ValueError("width must be positive")
-    
-    cx, cy = center 
+
+    cx, cy = center
     radius = width / math.sqrt(3)
     return [
         (
@@ -46,7 +47,9 @@ def hex_vertices(center,width) :
         for i in range(6)
     ]
 
+
 # help and conventions from redblobgames.com
+
 
 def hexagonal_grid_coordinates(image_width, image_height, hex_width):
     """Compute the pixel coordinates of hexagon centers covering an image.
@@ -68,37 +71,37 @@ def hexagonal_grid_coordinates(image_width, image_height, hex_width):
     Raises:
         ValueError: if any argument is not strictly positive.
     """
-    if image_width <= 0 or image_height <= 0 or hex_width <= 0 :
+    if image_width <= 0 or image_height <= 0 or hex_width <= 0:
         raise ValueError("image dimensions and hex_width must be positive")
     if hex_width > image_width:
         raise ValueError("hex_width must me inferior to image_width.")
 
     size = hex_width / math.sqrt(3)  # radius: center -> vertex
-    row_spacing = 1.5 * size # space between 2 centers on consecutive rows
+    row_spacing = 1.5 * size  # space between 2 centers on consecutive rows
 
-
-    grid = [] #list[list[Point]]
+    grid = []  # list[list[Point]]
     row = 0
     # A row is kept while its top (y pointing down) vertex is above the image's bottom edge.
-    while row_spacing * row - size / 2 < image_height :
+    while row_spacing * row - size / 2 < image_height:
         y = size / 2 + row_spacing * row
-        if row % 2 == 0 : # even-r convention
+        if row % 2 == 0:  # even-r convention
             shift = hex_width / 2
-        else : 
-            shift  = 0  
-        line = [] # list[Point]
+        else:
+            shift = 0
+        line = []  # list[Point]
         col = 0
         # A hexagon is kept while its left edge is before the image's right edge.
-        while shift + col * hex_width - hex_width / 2 < image_width : 
+        while shift + col * hex_width - hex_width / 2 < image_width:
             line.append((shift + col * hex_width, y))
             col += 1
         grid.append(line)
         row += 1
     return grid
 
-def compute_next_coord(grid,pos):
+
+def compute_next_coord(grid, pos):
     """Given a grid and a current position, computes and returns the next position.
-    Returns (-1,-1) if the grid is over. 
+    Returns (-1,-1) if the grid is over.
     To compute the first position, call compute_next_grid(grid,None)
 
     Args:
@@ -106,7 +109,7 @@ def compute_next_coord(grid,pos):
         pos (tuple): coordinates of the current position
 
     Returns:
-        tuple : coordinates (row, col) of the next position in the grid, 
+        tuple : coordinates (row, col) of the next position in the grid,
         (-1,-1) if the grid is over.
     """
     if not grid or not grid[0]:
@@ -119,21 +122,23 @@ def compute_next_coord(grid,pos):
         return (row, col + 1)
     if row + 1 < len(grid):  # first center of the next row
         return (row + 1, 0)
-    return (-1,-1)
+    return (-1, -1)
 
-# Sample color 
 
-# 1. Helper in_hexagon 
+# Sample color
 
-def in_hex(dx,dy,hex_width):
+# 1. Helper in_hexagon
+
+
+def in_hex(dx, dy, hex_width):
     """Given an hexagon of center (cx,cy) and width hex_width, the function returns
-    true if a pixel of coordinates (cx + dx, cy + dy) is in the hexagon. 
+    true if a pixel of coordinates (cx + dx, cy + dy) is in the hexagon.
     Returns False otherwise
 
     Args:
-        dx (float): offset between the row coord of the hexagon center 
+        dx (float): offset between the row coord of the hexagon center
         and the row coordinate of the pixel
-        dy (float): offset between the column coord of the hexagon center 
+        dy (float): offset between the column coord of the hexagon center
         and the column coordinate of the pixel
         hex_width (float): hexagone width
     """
@@ -149,9 +154,10 @@ def in_hex(dx,dy,hex_width):
     max_dy = radius - dx / math.sqrt(3)
     return not dy > max_dy
 
+
 def sample_color(coord, input, hex_width):
-    """Given an hexagon with center of coordinates coord and of width hex_width, 
-    and a grid of pixel (input), it returns the RGB code of the average color 
+    """Given an hexagon with center of coordinates coord and of width hex_width,
+    and a grid of pixel (input), it returns the RGB code of the average color
     of all pixels contained in the hexagon
 
     Args:
@@ -185,8 +191,11 @@ def sample_color(coord, input, hex_width):
         y = min(max(math.floor(cy), 0), height - 1)
         return img.getpixel((x, y))
 
-    return (round(r_sum / n_pixels),round(g_sum / n_pixels),
-            round(b_sum / n_pixels),)
+    return (
+        round(r_sum / n_pixels),
+        round(g_sum / n_pixels),
+        round(b_sum / n_pixels),
+    )
 
 
 def generate_hexagon(coord, rgb, hex_width):
@@ -194,22 +203,26 @@ def generate_hexagon(coord, rgb, hex_width):
 
     Args:
         coord (tuple): coordinates of the hexagon center
-        rgb (tuple): RGB code of the hexagon color 
+        rgb (tuple): RGB code of the hexagon color
         hex_width (float): hexagon width
     """
-    vertices = hex_vertices(coord, hex_width) # re-use the helper function created for hex_grid_coord
+    vertices = hex_vertices(
+        coord, hex_width
+    )  # re-use the helper function created for hex_grid_coord
     points = " ".join(f"{x:.2f},{y:.2f}" for x, y in vertices)
     r, g, b = rgb
     return f'<polygon points="{points}" fill="rgb({r},{g},{b})"/>'
 
+
 # Generate output (SVG file) and append hexagon to output
+
 
 def init_svg(path, width, height):
     """Create an empty SVG document (root element only) and return its path.
 
     Args:
         path (string): name of the outputpath
-        width (int): width of input image 
+        width (int): width of input image
         height (int): height of input image
     """
     header = (
@@ -234,8 +247,8 @@ def append_hexagon(output, geometry):
 
 
 def png2svg(input_path, output_path, hex_width):
-    """Transform a png image (given by input_path) into a svg file 
-    stored into ouput_path. The hexagon of the SVG are grid have their width 
+    """Transform a png image (given by input_path) into a svg file
+    stored into ouput_path. The hexagon of the SVG are grid have their width
     equal to hex_width.
 
     Args:
@@ -251,7 +264,7 @@ def png2svg(input_path, output_path, hex_width):
     pos = None
     while True:
         pos = compute_next_coord(grid, pos)
-        if pos == (-1,-1):
+        if pos == (-1, -1):
             break
         row, col = pos
         coord = grid[row][col]
@@ -259,4 +272,3 @@ def png2svg(input_path, output_path, hex_width):
         geometry = generate_hexagon(coord, rgb, hex_width)
         append_hexagon(output, geometry)
     return output
-  
