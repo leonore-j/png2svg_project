@@ -808,7 +808,7 @@ requires-dist = [{ name = "pillow" }]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "marimo", specifier = ">=0.25.2" },
+    { name = "marimo", specifier = ">=0.10" },
     { name = "numpy", specifier = ">=2.4.6" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-cov", specifier = ">=7.1.0" },

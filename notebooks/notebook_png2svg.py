@@ -8,13 +8,13 @@
 
 import marimo
 
-
 __generated_with = "0.25.1"
 app = marimo.App(width="medium")
 
 with app.setup:
     import tempfile
     from pathlib import Path
+
     import marimo as mo
 
     from png2svg.core import png2svg
